@@ -1,0 +1,32 @@
+--- a/net/minecraft/world/inventory/MerchantContainer.java
++++ b/net/minecraft/world/inventory/MerchantContainer.java
+@@ -26,11 +_,27 @@
+     }
+ 
+     public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.add(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.add(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in MerchantContainer.onOpen - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.remove(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.remove(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in MerchantContainer.onClose - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+         this.merchant.setTradingPlayer(null); // SPIGOT-4860
+     }
+ 

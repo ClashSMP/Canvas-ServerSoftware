@@ -1,0 +1,37 @@
+--- a/net/minecraft/world/CompoundContainer.java
++++ b/net/minecraft/world/CompoundContainer.java
+@@ -21,16 +_,32 @@
+ 
+     @Override
+     public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
+         this.container1.onOpen(player);
+         this.container2.onOpen(player);
+-        this.transaction.add(player);
++        try {
++            this.transaction.add(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in CompoundContainer.onOpen - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
+     public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
+         this.container1.onClose(player);
+         this.container2.onClose(player);
+-        this.transaction.remove(player);
++        try {
++            this.transaction.remove(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in CompoundContainer.onClose - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override

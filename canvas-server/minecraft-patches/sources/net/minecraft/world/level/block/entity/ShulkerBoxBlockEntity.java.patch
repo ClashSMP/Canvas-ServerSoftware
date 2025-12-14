@@ -40,6 +40,37 @@
  
      // CraftBukkit start - add fields and methods
      public List<org.bukkit.entity.HumanEntity> transaction = new java.util.ArrayList<>();
+@@ -61,12 +_,28 @@
+ 
+     @Override
+     public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.add(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.add(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in ShulkerBoxBlockEntity.onOpen - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
+     public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.remove(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.remove(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in ShulkerBoxBlockEntity.onClose - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
 @@ -134,6 +_,11 @@
                      doNeighborUpdates(level, pos, state);
                  }

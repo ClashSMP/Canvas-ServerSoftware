@@ -55,6 +55,37 @@
      protected final ContainerData containerData = new ContainerData() {
          private final int[] slotStates = new int[9];
          private int triggered = 0;
+@@ -69,12 +_,28 @@
+ 
+     @Override
+     public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.add(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.add(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in CrafterBlockEntity.onOpen - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
+     public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.remove(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.remove(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in CrafterBlockEntity.onClose - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
 @@ -169,6 +_,11 @@
              }
          });

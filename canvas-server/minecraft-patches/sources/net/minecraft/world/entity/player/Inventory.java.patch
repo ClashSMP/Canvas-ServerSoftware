@@ -1,0 +1,33 @@
+--- a/net/minecraft/world/entity/player/Inventory.java
++++ b/net/minecraft/world/entity/player/Inventory.java
+@@ -97,12 +_,28 @@
+ 
+     @Override
+     public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.add(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.add(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in Inventory.onOpen - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
+     public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.remove(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.remove(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in Inventory.onClose - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override

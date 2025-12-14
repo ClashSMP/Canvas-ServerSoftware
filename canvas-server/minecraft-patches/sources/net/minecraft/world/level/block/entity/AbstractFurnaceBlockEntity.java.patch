@@ -54,6 +54,37 @@
  
      protected AbstractFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState, RecipeType<? extends AbstractCookingRecipe> recipeType) {
          super(type, pos, blockState);
+@@ -124,12 +_,28 @@
+ 
+     @Override
+     public void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.add(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.add(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in AbstractFurnaceBlockEntity.onOpen - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
+     public void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity player) {
+-        this.transaction.remove(player);
++        // Canvas start - guard against plugin-caused invalid state
++        if (player == null) return;
++        try {
++            this.transaction.remove(player);
++        } catch (IndexOutOfBoundsException e) {
++            org.bukkit.Bukkit.getLogger().warning("[Canvas] IndexOutOfBoundsException in AbstractFurnaceBlockEntity.onClose - likely caused by a plugin. Player: " + player.getName());
++            e.printStackTrace();
++        }
++        // Canvas end
+     }
+ 
+     @Override
 @@ -164,6 +_,11 @@
          this.recipesUsed.clear();
          this.recipesUsed.putAll(input.read("RecipesUsed", RECIPES_USED_CODEC).orElse(Map.of()));
